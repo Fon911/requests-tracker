@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Databases
+*.db
+*.sqlite3
+
+# Node
+node_modules/
+dist/
+.vite/
+coverage/
+
+# Env
+.env
+.env.local
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Local tooling
+.claude/
+
+# Personal / prep files — not part of the deliverable
+CLAUDE.md
+docs/
