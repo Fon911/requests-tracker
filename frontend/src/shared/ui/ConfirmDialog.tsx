@@ -19,7 +19,7 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   return (
-    <Modal title={title} onClose={onCancel}>
+    <Modal title={title} onClose={onCancel} closable={!busy}>
       <div className="form">
         <p className="confirm__text">{message}</p>
         <div className="form__actions">

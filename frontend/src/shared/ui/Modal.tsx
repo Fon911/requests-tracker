@@ -7,22 +7,34 @@ const FOCUSABLE =
 interface ModalProps {
   title: string
   onClose: () => void
+  closable?: boolean
   children: ReactNode
 }
 
-export function Modal({ title, onClose, children }: ModalProps) {
+export function Modal({ title, onClose, closable = true, children }: ModalProps) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const onCloseRef = useRef(onClose)
+  const closableRef = useRef(closable)
+  const pressStartedOnOverlay = useRef(false)
+
+  onCloseRef.current = onClose
+  closableRef.current = closable
+
+  function requestClose() {
+    if (closableRef.current) onCloseRef.current()
+  }
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null
-    const focusable = () => Array.from(cardRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])
+    const focusable = () =>
+      Array.from(cardRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])
     const body = cardRef.current?.querySelector<HTMLElement>('.modal__body')
     const firstField = body?.querySelector<HTMLElement>(FOCUSABLE)
     ;(firstField ?? focusable()[0])?.focus()
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        if (closableRef.current) onCloseRef.current()
         return
       }
       if (event.key !== 'Tab') return
@@ -48,21 +60,37 @@ export function Modal({ title, onClose, children }: ModalProps) {
       document.body.style.overflow = previousOverflow
       previouslyFocused?.focus?.()
     }
-  }, [onClose])
+  }, [])
 
   return (
-    <div className="modal__overlay" onClick={onClose}>
+    <div
+      className="modal__overlay"
+      onMouseDown={(event) => {
+        pressStartedOnOverlay.current = event.target === event.currentTarget
+      }}
+      onMouseUp={(event) => {
+        if (pressStartedOnOverlay.current && event.target === event.currentTarget) {
+          requestClose()
+        }
+        pressStartedOnOverlay.current = false
+      }}
+    >
       <div
         ref={cardRef}
         className="modal__card"
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        onClick={(event) => event.stopPropagation()}
       >
         <header className="modal__header">
           <h2 className="modal__title">{title}</h2>
-          <button className="modal__close" type="button" aria-label="Закрыть" onClick={onClose}>
+          <button
+            className="modal__close"
+            type="button"
+            aria-label="Закрыть"
+            disabled={!closable}
+            onClick={requestClose}
+          >
             ×
           </button>
         </header>
