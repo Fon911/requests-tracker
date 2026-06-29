@@ -52,7 +52,7 @@ class TicketRead(BaseModel):
 class TicketListParams(BaseModel):
     status: Status | None = None
     priority: Priority | None = None
-    q: str | None = None
+    q: str | None = Field(default=None, max_length=120)
     sort_by: SortField = SortField.CREATED_AT
     order: SortOrder = SortOrder.DESC
     page: int = 1
