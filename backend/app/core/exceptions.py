@@ -1,4 +1,5 @@
 from fastapi import Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 
@@ -47,4 +48,19 @@ async def domain_error_handler(_: Request, exc: DomainError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": {"code": exc.code, "message": exc.message}},
+    )
+
+
+async def validation_error_handler(_: Request, exc: RequestValidationError) -> JSONResponse:
+    errors = exc.errors()
+    if errors:
+        first = errors[0]
+        location = ".".join(str(part) for part in first.get("loc", ()) if part != "body")
+        detail = first.get("msg", "Некорректные данные")
+        message = f"{location}: {detail}" if location else detail
+    else:
+        message = "Некорректные данные"
+    return JSONResponse(
+        status_code=422,
+        content={"error": {"code": "validation_error", "message": message}},
     )

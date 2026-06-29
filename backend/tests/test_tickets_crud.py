@@ -40,6 +40,14 @@ async def test_create_ticket_rejects_short_title(client: AsyncClient) -> None:
     assert response.status_code == 422
 
 
+async def test_validation_error_uses_unified_envelope(client: AsyncClient) -> None:
+    response = await client.post("/api/tickets", json={"title": "ab"})
+    assert response.status_code == 422
+    body = response.json()
+    assert body["error"]["code"] == "validation_error"
+    assert body["error"]["message"]
+
+
 async def test_create_ticket_rejects_blank_title(client: AsyncClient) -> None:
     response = await client.post("/api/tickets", json={"title": "   "})
     assert response.status_code == 422
