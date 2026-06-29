@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
-from app.bootstrap import init_models, seed_admin
+from app.bootstrap import init_models, seed_admin, seed_sample_tickets
 from app.core.config import get_settings
 from app.core.exceptions import (
     DomainError,
@@ -19,6 +19,7 @@ async def lifespan(_: FastAPI):
     if not get_settings().is_production:
         await init_models()
     await seed_admin()
+    await seed_sample_tickets()
     yield
 
 
