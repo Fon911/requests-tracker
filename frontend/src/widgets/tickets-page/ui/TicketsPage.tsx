@@ -123,7 +123,7 @@ export function TicketsPage() {
         </div>
       )
     }
-    if (ticketsQuery.isError) {
+    if (ticketsQuery.isError && !data) {
       return (
         <ErrorState
           message={
@@ -140,6 +140,11 @@ export function TicketsPage() {
     }
     return (
       <>
+        {ticketsQuery.isError && (
+          <p className="banner banner--error" role="alert">
+            Не удалось обновить список — показаны последние загруженные данные.
+          </p>
+        )}
         <TicketTable
           tickets={data.items}
           isAdmin={isAuthenticated}
