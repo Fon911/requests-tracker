@@ -58,18 +58,6 @@ export const PRIORITY_LABELS: Record<Priority, string> = {
   high: 'Высокий',
 }
 
-export const STATUS_TONES: Record<Status, string> = {
-  new: 'new',
-  in_progress: 'progress',
-  done: 'done',
-}
-
-export const PRIORITY_TONES: Record<Priority, string> = {
-  low: 'low',
-  normal: 'normal',
-  high: 'high',
-}
-
 export const STATUS_OPTIONS: SelectOption[] = STATUS_VALUES.map((value) => ({
   value,
   label: STATUS_LABELS[value],
