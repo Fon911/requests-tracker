@@ -16,7 +16,7 @@ import { TicketFilters } from '@/features/ticket-filters/ui/TicketFilters'
 import { TicketTable } from '@/features/ticket-table/ui/TicketTable'
 import { ApiError } from '@/shared/api/http'
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue'
-import { Button, Modal, Spinner } from '@/shared/ui'
+import { Button, ConfirmDialog, Modal, Spinner } from '@/shared/ui'
 
 import { Pagination } from './Pagination'
 import { EmptyState, ErrorState } from './StateViews'
@@ -35,6 +35,9 @@ export function TicketsPage() {
   const [page, setPage] = useState(1)
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [ticketToDelete, setTicketToDelete] = useState<Ticket | null>(null)
+
+  const hasActiveFilters = Boolean(debouncedSearch.trim() || status || priority)
 
   function changeFilter<T>(setter: (value: T) => void, value: T) {
     setter(value)
@@ -88,10 +91,18 @@ export function TicketsPage() {
   }
 
   function handleDelete(ticket: Ticket) {
-    if (!window.confirm(`Удалить заявку «${ticket.title}»?`)) return
     setActionError(null)
-    deleteTicket.mutate(ticket.id, {
-      onError: (error) => reportMutationError(error, 'Не удалось удалить заявку'),
+    setTicketToDelete(ticket)
+  }
+
+  function confirmDelete() {
+    if (!ticketToDelete) return
+    deleteTicket.mutate(ticketToDelete.id, {
+      onSuccess: () => setTicketToDelete(null),
+      onError: (error) => {
+        setTicketToDelete(null)
+        reportMutationError(error, 'Не удалось удалить заявку')
+      },
     })
   }
 
@@ -125,7 +136,7 @@ export function TicketsPage() {
       )
     }
     if (!data || data.items.length === 0) {
-      return <EmptyState />
+      return <EmptyState filtered={hasActiveFilters} onReset={handleReset} />
     }
     return (
       <>
@@ -192,6 +203,16 @@ export function TicketsPage() {
             onCancel={() => setCreateOpen(false)}
           />
         </Modal>
+      )}
+
+      {ticketToDelete && (
+        <ConfirmDialog
+          title="Удаление заявки"
+          message={`Удалить заявку «${ticketToDelete.title}»? Действие необратимо.`}
+          busy={deleteTicket.isPending}
+          onConfirm={confirmDelete}
+          onCancel={() => setTicketToDelete(null)}
+        />
       )}
     </div>
   )

@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
 
-import { clearToken, setToken } from '@/shared/session/session'
+import { clearToken, setToken, setUnauthorizedHandler } from '@/shared/session/session'
 
 import { ApiError, request } from './http'
 
@@ -62,6 +62,28 @@ it('throws ApiError with the server code and message', async () => {
     code: 'ticket_done_immutable',
     message: 'нельзя',
   })
+})
+
+it('notifies the unauthorized handler on a 401 to an authenticated request', async () => {
+  const handler = vi.fn()
+  setUnauthorizedHandler(handler)
+  stubFetch({ ok: false, status: 401, body: { error: { code: 'x', message: 'y' } } })
+
+  await request('/tickets/1', { method: 'DELETE', auth: true }).catch(() => undefined)
+
+  expect(handler).toHaveBeenCalledTimes(1)
+  setUnauthorizedHandler(null)
+})
+
+it('does not notify the handler on a 401 to an unauthenticated request (login)', async () => {
+  const handler = vi.fn()
+  setUnauthorizedHandler(handler)
+  stubFetch({ ok: false, status: 401, body: { error: { code: 'invalid_credentials', message: 'y' } } })
+
+  await request('/auth/login', { method: 'POST', body: {} }).catch(() => undefined)
+
+  expect(handler).not.toHaveBeenCalled()
+  setUnauthorizedHandler(null)
 })
 
 it('falls back to a generic ApiError when the body is not parseable', async () => {
