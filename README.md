@@ -11,11 +11,15 @@
 
 ## Запустить за минуту
 
-Нужен только Docker:
+Нужен только Docker — скопируй и выполни:
 
 ```bash
+git clone https://github.com/Fon911/requests-tracker.git
+cd requests-tracker
 docker compose up --build
 ```
+
+Дальше:
 
 - Приложение — http://localhost:5173
 - API и Swagger — http://localhost:8000/docs
