@@ -68,7 +68,7 @@ export function TicketsPage() {
 
   function reportMutationError(error: unknown, fallback: string) {
     if (error instanceof ApiError && error.status === 401) {
-      setActionError('Сессия администратора истекла — войдите снова')
+      setActionError('Сессия истекла, войдите заново')
       return
     }
     setActionError(error instanceof ApiError ? error.message : fallback)
@@ -142,7 +142,7 @@ export function TicketsPage() {
       <>
         {ticketsQuery.isError && (
           <p className="banner banner--error" role="alert">
-            Не удалось обновить список — показаны последние загруженные данные.
+            Не удалось обновить список, показаны прошлые данные
           </p>
         )}
         <TicketTable
@@ -213,7 +213,7 @@ export function TicketsPage() {
       {ticketToDelete && (
         <ConfirmDialog
           title="Удаление заявки"
-          message={`Удалить заявку «${ticketToDelete.title}»? Действие необратимо.`}
+          message={`Удалить заявку «${ticketToDelete.title}»? Отменить будет нельзя`}
           busy={deleteTicket.isPending}
           onConfirm={confirmDelete}
           onCancel={() => setTicketToDelete(null)}
