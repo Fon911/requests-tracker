@@ -16,13 +16,8 @@ class SortOrder(StrEnum):
     DESC = "desc"
 
 
-def _normalize_title(value: str | None) -> str | None:
-    if value is None:
-        return None
-    stripped = value.strip()
-    if len(stripped) < 3:
-        raise ValueError("title must contain at least 3 non-space characters")
-    return stripped
+def _strip_title(value: str | None) -> str | None:
+    return value.strip() if isinstance(value, str) else value
 
 
 class TicketCreate(BaseModel):
@@ -30,7 +25,7 @@ class TicketCreate(BaseModel):
     description: str | None = Field(default=None, max_length=1000)
     priority: Priority = Priority.NORMAL
 
-    _strip_title = field_validator("title")(_normalize_title)
+    _normalize_title = field_validator("title", mode="before")(_strip_title)
 
 
 class TicketUpdate(BaseModel):
@@ -39,7 +34,7 @@ class TicketUpdate(BaseModel):
     status: Status | None = None
     priority: Priority | None = None
 
-    _strip_title = field_validator("title")(_normalize_title)
+    _normalize_title = field_validator("title", mode="before")(_strip_title)
 
 
 class TicketRead(BaseModel):
@@ -61,4 +56,4 @@ class TicketListParams(BaseModel):
     sort_by: SortField = SortField.CREATED_AT
     order: SortOrder = SortOrder.DESC
     page: int = 1
-    page_size: int = 20
+    page_size: int
