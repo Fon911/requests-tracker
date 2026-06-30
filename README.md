@@ -19,8 +19,8 @@ docker compose up --build
 
 Что открыть:
 
-- приложение — http://localhost:5173
-- API и Swagger — http://localhost:8000/docs
+- приложение: http://localhost:5173
+- API и Swagger: http://localhost:8000/docs
 - вход админа: `admin` / `admin` (нужен только чтобы удалять)
 
 При первом запуске база сама наполняется демо-заявками с разными статусами, приоритетами и
